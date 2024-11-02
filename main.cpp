@@ -4,22 +4,32 @@ using namespace std;
 #include <fstream>
 #include <iomanip>
 #include <list>
+#include <numeric>
 #include "Goat.h"
+
+/* FUNCTION PROTOTYPES */
+int main_menu();
+int select_goat(list<Goat> trip);
+void delete_goat(list<Goat>& trip);
+void add_goat(list<Goat>& trip, string[], string[]);
+void find_youngest(list<Goat> trip);
+void find_oldest(list<Goat> trip);
+double find_avg_age(list<Goat> trip);
+void duplicate_goat(list<Goat>& trip);
+void apply_age_limit(list<Goat>& trip);
+void apply_age_limit(list<Goat>& trp);
+void display_trip(list<Goat> trip);
+int getValidatedAge();
 
 /* CONSTANTS */
 const int SZ_NAMES = 200, SZ_COLORS = 25;
 
-/* FUNCTION PROTOTYPES */
-int select_goat(list<Goat> trip);
-void delete_goat(list<Goat>& trip);
-void add_goat(list<Goat>& trip, string[], string[]);
-void display_trip(list<Goat> trip);
-int main_menu();
-
+// main() is the entry point of the program and drives the program
+// arguments: none
+// returns: int - the exit code of the program
 int main() {
 
 	srand(time(0));
-	bool again;
 
 	// read & populate arrays for names and colors
 	ifstream fin("names.txt");
@@ -58,31 +68,72 @@ int main() {
 	// Goat Manager 3001 Engine
 	int sel = main_menu();
 
-	while (sel != 4) {
+	while (sel != 12) {
 
 		switch (sel) {
 
 		case 1:
-			cout << "Adding a goat.\n";
+			cout << endl << "Adding a goat.\n";
 			add_goat(trip, names, colors);
 			break;
 
 		case 2:
-			cout << "Removing a goat.\n";
+			cout << endl << "Removing a goat.\n";
 			delete_goat(trip);
 			break;
 
 		case 3:
-			cout << "Displaying goat data.\n";
+			cout << endl << "Displaying goat data.\n";
 			display_trip(trip);
 			break;
 
+		case 4:
+			cout << endl << "Finding the youngest goat.\n";
+			find_youngest(trip);
+			break;
+
+		case 5:
+			cout << endl << "Finding the oldest goat.\n";
+			find_oldest(trip);
+			break;
+
+		case 6:
+			cout << endl << "Finding the average age of the goats.\n";
+			cout << "Average age: " << find_avg_age(trip) << endl;
+			break;
+
+		case 7:
+			cout << endl << "Duplicating a goat.\n";
+			duplicate_goat(trip);
+			break;
+
+		case 8:
+			cout << endl << "Sorting goats by name.\n";
+			trip.sort([](Goat a, Goat b) { return a.get_name() < b.get_name(); }); // sort by name (ascending)
+			break;
+
+		case 9:
+			cout << endl << "Sorting goats by age.\n";
+			trip.sort([](Goat a, Goat b) { return a.get_age() < b.get_age(); }); // sort by age (ascending)
+			break;
+
+		case 10:
+			cout << endl << "Reversing the trip.\n";
+			trip.reverse();
+			break;
+
+		case 11:
+			cout << endl << "Applying age limit.\n";
+			apply_age_limit(trip);
+			break;
+
 		default:
-			cout << "Invalid selection.\n";
+			cout << endl << "Invalid selection.\n";
 			break;
 
 		}
 
+		cout << endl; // output blank line for formatting purposes
 		sel = main_menu();
 
 	}
@@ -91,19 +142,30 @@ int main() {
 
 }
 
+// main_menu() displays the main menu and gets the user's choice
+// arguments: none
+// returns: int - the user's choice
 int main_menu() {
 
 	cout << "*** GOAT MANAGER 3001 ***\n";
 	cout << "[1] Add a goat\n";
 	cout << "[2] Delete a goat\n";
 	cout << "[3] List goats\n";
-	cout << "[4] Quit\n";
+	cout << "[4] List youngest goat\n";
+	cout << "[5] List oldest goat\n";
+	cout << "[6] List average age\n";
+	cout << "[7] Duplicate goat\n";
+	cout << "[8] Sort goats by name\n";
+	cout << "[9] Sort goats by age\n";
+	cout << "[10] Reverse trip\n";
+	cout << "[11] Apply age limit\n";
+	cout << "[12] Quit\n";
 	cout << "Choice --> ";
 
 	int choice;
 	cin >> choice;
 
-	while (choice < 1 || choice > 4) {
+	while (choice < 1 || choice > 12) {
 
 		cout << "Invalid, again --> ";
 		cin >> choice;
@@ -114,44 +176,9 @@ int main_menu() {
 
 }
 
-void delete_goat(list<Goat>& trip) {
-
-	cout << "DELETE A GOAT\n";
-
-	int index = select_goat(trip);
-	auto it = trip.begin();
-
-	advance(it, index - 1);
-	trip.erase(it);
-
-	cout << "Goat deleted. New trip size: " << trip.size() << endl;
-
-}
-
-void add_goat(list<Goat>& trip, string nms[], string cls[]) {
-
-	cout << "ADD A GOAT\n";
-
-	int age = rand() % MAX_AGE;
-	string nm = nms[rand() % SZ_NAMES];
-	string cl = cls[rand() % SZ_COLORS];
-
-	Goat tmp(nm, age, cl);
-	trip.push_back(tmp);
-
-	cout << "Goat added. New trip size: " << trip.size() << endl;
-
-}
-
-void display_trip(list<Goat> trp) {
-
-	int i = 1;
-
-	for (auto gt : trp)
-		cout << "\t" << "[" << i++ << "] " << gt.get_name() << " (" << gt.get_age() << ", " << gt.get_color() << ")\n";
-
-}
-
+// select_goat() displays the goats in the trip and gets the user's choice
+// arguments: list<Goat> trip - the list of goats
+// returns: int - the user's choice
 int select_goat(list<Goat> trp) {
 
 	int input;
@@ -168,5 +195,40 @@ int select_goat(list<Goat> trp) {
 	}
 
 	return input;
+
+}
+
+// add_goat() adds a goat to the trip
+// arguments: list<Goat> trip - the list of goats, string names[] - the array of names, string colors[] - the array of colors
+// returns: none
+void add_goat(list<Goat>& trip, string nms[], string cls[]) {
+
+	cout << "ADD A GOAT\n";
+
+	int age = rand() % MAX_AGE;
+	string nm = nms[rand() % SZ_NAMES];
+	string cl = cls[rand() % SZ_COLORS];
+
+	Goat tmp(nm, age, cl);
+	trip.push_back(tmp);
+
+	cout << "Goat added. New trip size: " << trip.size() << endl;
+
+}
+
+// delete_goat() deletes a goat from the trip
+// arguments: list<Goat> trip - the list of goats
+// returns: none
+void delete_goat(list<Goat>& trip) {
+
+	cout << "DELETE A GOAT\n";
+
+	int index = select_goat(trip);
+	auto it = trip.begin();
+
+	advance(it, index - 1);
+	trip.erase(it);
+
+	cout << "Goat deleted. New trip size: " << trip.size() << endl;
 
 }
