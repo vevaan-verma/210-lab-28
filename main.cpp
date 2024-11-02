@@ -232,3 +232,56 @@ void delete_goat(list<Goat>& trip) {
 	cout << "Goat deleted. New trip size: " << trip.size() << endl;
 
 }
+
+// find_youngest() finds the youngest goat in the trip
+// arguments: list<Goat> trip - the list of goats
+// returns: none
+void find_youngest(list<Goat> trp) {
+
+	Goat youngest = *min_element(trp.begin(), trp.end(), [](Goat a, Goat b) { return a.get_age() < b.get_age(); }); // lambda function to compare ages and find youngest
+	cout << "Youngest Goat: " << youngest.get_name() << " (" << youngest.get_age() << ", " << youngest.get_color() << ")\n";
+
+}
+
+// find_oldest() finds the oldest goat in the trip
+// arguments: list<Goat> trip - the list of goats
+// returns: none
+void find_oldest(list<Goat> trp) {
+
+	Goat oldest = *max_element(trp.begin(), trp.end(), [](Goat a, Goat b) { return a.get_age() < b.get_age(); }); // lambda function to compare ages and find oldest
+	cout << "Oldest Goat: " << oldest.get_name() << " (" << oldest.get_age() << ", " << oldest.get_color() << ")\n";
+
+}
+
+// find_avg_age() finds the average age of the goats in the trip
+// arguments: list<Goat> trip - the list of goats
+// returns: double - the average age
+double find_avg_age(list<Goat> trp) {
+
+	double sum = std::accumulate(trp.begin(), trp.end(), 0, [](double a, Goat b) { return a + b.get_age(); }); // sum of ages
+	return sum / trp.size();
+
+}
+
+// duplicate_goat() duplicates a goat in the trip
+// arguments: list<Goat> trip - the list of goats
+// returns: none
+void duplicate_goat(list<Goat>& trp) {
+
+	int copyIndex = select_goat(trp);
+	copy(next(trp.begin(), copyIndex - 1), next(trp.begin(), copyIndex), back_inserter(trp)); // copy selected goat to end of list
+	cout << "Goat duplicated. New trip size: " << trp.size() << endl;
+
+}
+
+// display_trip() outputs all the goats in the trip
+// arguments: list<Goat> trip - the list of goats
+// returns: none
+void display_trip(list<Goat> trp) {
+
+	int i = 1;
+
+	for (auto gt : trp)
+		cout << "\t" << "[" << i++ << "] " << gt.get_name() << " (" << gt.get_age() << ", " << gt.get_color() << ")" << endl;
+
+}
