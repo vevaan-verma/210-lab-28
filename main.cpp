@@ -274,6 +274,19 @@ void duplicate_goat(list<Goat>& trp) {
 
 }
 
+// apply_age_limit() removes goats older than 10 years from the trip
+// arguments: list<Goat> trip - the list of goats
+// returns: none
+void apply_age_limit(list<Goat>& trp) {
+
+	cout << "Enter the age limit: ";
+	int ageLimit = getValidatedAge();
+
+	trp.remove_if([ageLimit](const Goat& goat) { return goat.get_age() > ageLimit; }); // remove goats older than input age
+	cout << "Goats older than " << ageLimit << " removed. New trip size: " << trp.size() << endl;
+
+}
+
 // display_trip() outputs all the goats in the trip
 // arguments: list<Goat> trip - the list of goats
 // returns: none
@@ -283,5 +296,24 @@ void display_trip(list<Goat> trp) {
 
 	for (auto gt : trp)
 		cout << "\t" << "[" << i++ << "] " << gt.get_name() << " (" << gt.get_age() << ", " << gt.get_color() << ")" << endl;
+
+}
+
+// getValidatedAge() gets a valid age from the user
+// arguments: none
+// returns: int - the valid age
+int getValidatedAge() {
+
+	int inputAge; // variable to store the input (of type int)
+
+	while (!(cin >> inputAge) || inputAge < 0) { // while the input is not an integer or is less than 0
+
+		cin.clear(); // clear the input stream
+		cin.ignore(INT_MAX, '\n'); // ignore the invalid input
+		cout << "Invalid input. Please enter a valid age: "; // prompt the user to enter a valid age
+
+	}
+
+	return inputAge;
 
 }
